@@ -1,0 +1,893 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Thực Dưỡng Ban Mai - Menu Ăn Sáng & Sữa Hạt Lành Mạnh</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #fcfbf9;
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
+    }
+    .container-fluid-custom {
+      width: 100%;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    .item-card { 
+      background: #ffffff;
+      border: 1.5px solid #eae5df;
+      border-radius: 20px;
+      cursor: pointer;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+    .item-card:hover {
+      border-color: #a38263;
+    }
+    .item-card.selected { 
+      border-color: #5d4037; 
+      background-color: #f7f4f0; 
+      box-shadow: 0 4px 12px rgba(93, 64, 55, 0.06); 
+    }
+    .nature-header-clean {
+      background: #ffffff;
+      border: 2px solid #5d4037;
+      box-shadow: 0 6px 20px rgba(93, 64, 55, 0.06);
+      border-radius: 20px;
+    }
+    .bottom-checkout-card {
+      background: #ffffff;
+      border: 2px solid #5d4037;
+      border-radius: 24px;
+      box-shadow: 0 -8px 25px rgba(93, 64, 55, 0.1);
+    }
+    .nature-button {
+      background: linear-gradient(135deg, #6b4c3b 0%, #5d4037 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(107, 76, 59, 0.25);
+    }
+    .lotus-flower-btn {
+      background: linear-gradient(135deg, #fffdfa 0%, #f6eee3 100%);
+      border: 2px solid #b89778;
+      border-radius: 50px 20px 50px 20px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(163, 130, 99, 0.15);
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      width: 100%;
+    }
+    
+    /* MÀN HÌNH CHỜ BUỔI SỚM MAI CÓ HIỆU ỨNG ĐỘNG & ÂM THANH (3 GIÂY) */
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #fffdfa 0%, #f7f3ee 50%, #efe7dd 100%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+      color: #5d4037;
+    }
+    #splash-screen.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .splash-content {
+      animation: fadeInScale 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      text-align: center;
+      padding: 0 1.5rem;
+    }
+
+    /* HIỆU ỨNG GIỌT SƯƠNG RƠI & RUNG RINH TRÊN LÁ */
+    .dew-drop-morning {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 1.2rem auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(184, 151, 120, 0.12);
+      border-radius: 50%;
+      border: 2px solid rgba(184, 151, 120, 0.3);
+      box-shadow: 0 10px 25px rgba(93, 64, 55, 0.1);
+      animation: morningDropFall 2s infinite ease-in-out;
+    }
+
+    @keyframes morningDropFall {
+      0% {
+        transform: translateY(-15px) scale(0.9);
+        opacity: 0.4;
+      }
+      50% {
+        transform: translateY(0) scale(1.05);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+    }
+
+    .dew-icon-anim {
+      animation: dropShimmer 1.2s infinite alternate ease-in-out;
+    }
+
+    @keyframes dropShimmer {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      100% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 6px 12px rgba(93, 64, 55, 0.3)); }
+    }
+
+    @keyframes fadeInScale {
+      0% {
+        opacity: 0;
+        transform: scale(0.92) translateY(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .image-zoom-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(4px);
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+    .image-zoom-modal img {
+      max-width: 90%;
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: 16px;
+      border: 2px solid #ffffff;
+    }
+
+    /* KHUNG CHAT TRỰC TIẾP */
+    #chat-widget-box {
+      position: fixed;
+      bottom: 95px;
+      right: 20px;
+      width: 320px;
+      max-width: calc(100vw - 40px);
+      background: #ffffff;
+      border: 2px solid #5d4037;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(93, 64, 55, 0.2);
+      z-index: 99;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: slideUpChat 0.3s ease forwards;
+    }
+    @keyframes slideUpChat {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="pt-5 pb-36 text-slate-800 antialiased">
+
+  <!-- MÀN HÌNH CHỜ BUỔI SỚM MAI CÓ HIỆU ỨNG ĐỘNG & ÂM THANH (3 GIÂY) -->
+  <div id="splash-screen">
+    <div class="splash-content max-w-md">
+      <div class="dew-drop-morning">
+        <i class="fa-solid fa-leaf text-3xl text-amber-700/70 absolute -bottom-1 -right-1"></i>
+        <span class="dew-icon-anim text-5xl">💧</span>
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-extrabold tracking-wider uppercase mb-2 text-amber-950 font-serif">Thực dưỡng Ban Mai</h2>
+      <p class="text-base sm:text-lg text-amber-900/80 italic font-medium mb-6">🌿 Thanh đạm và nguyên lành</p>
+      <div class="inline-flex items-center space-x-2 text-xs font-bold text-amber-900 bg-amber-100/80 px-5 py-2.5 rounded-full shadow-sm border border-amber-200">
+        <i class="fa-solid fa-seedling fa-spin text-amber-800"></i>
+        <span>Đang đón ánh nắng ban mai...</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid-custom">
+    
+    <!-- HEADER CHÍNH -->
+    <div class="nature-header-clean px-4 py-4 mb-6 w-full">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <!-- Logo & Tên quán -->
+        <div class="flex items-center space-x-3 w-full md:w-auto min-w-0">
+          <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-amber-50 p-0.5 shadow-sm border border-amber-200 overflow-hidden shrink-0 flex items-center justify-center">
+            <img src="images/logo.png" alt="BB Ban Mai Logo" class="w-full h-full object-cover rounded-full" fetchpriority="high">
+          </div>
+          <div class="min-w-0 flex-1">
+            <h1 class="text-sm sm:text-base font-extrabold tracking-wide uppercase text-amber-900 leading-tight truncate">THỰC DƯỠNG BAN MAI</h1>
+            <button type="button" onclick="toggleChatWidget()" class="text-amber-800 hover:text-amber-950 text-xs font-bold mt-0.5 inline-flex items-center space-x-1 transition text-left focus:outline-none">
+              <i class="fa-solid fa-comments text-amber-700"></i>
+              <span>Gặp bạn tại đây</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ĐÓA HOA SEN NGHỆ THUẬT -->
+        <div class="w-full md:w-auto shrink-0">
+          <button type="button" onclick="openDeliveryModal()" class="lotus-flower-btn text-center">
+            <span class="text-xs sm:text-sm font-semibold text-amber-950 tracking-wide italic">Định vị giao xa-Chạm vào đây ạ!</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DANH SÁCH MENU -->
+    <div class="space-y-6">
+      <div>
+        <!-- PHẦN 1: ĐỒ ĂN SÁNG -->
+        <div class="mb-4">
+          <h2 class="text-base sm:text-lg font-extrabold text-amber-900 px-1 mb-3 flex items-center uppercase tracking-wider">
+            <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center mr-2.5 shadow-sm border border-amber-200">
+              <i class="fa-solid fa-utensils text-sm"></i>
+            </span>
+            Menu Đồ Ăn Sáng
+          </h2>
+          <div id="food-container" class="space-y-3.5">
+            <div class="p-4 text-center text-xs text-stone-400">Đang tải thực đơn từ Google Sheets...</div>
+          </div>
+        </div>
+
+        <!-- PHẦN 2: SỮA HẠT -->
+        <div class="mt-8">
+          <h2 class="text-base sm:text-lg font-extrabold text-amber-900 px-1 mb-3 flex items-center uppercase tracking-wider">
+            <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center mr-2.5 shadow-sm border border-amber-200">
+              <i class="fa-solid fa-mug-hot text-sm"></i>
+            </span>
+            Menu Sữa Hạt Dinh Dưỡng
+          </h2>
+          <div id="milk-container" class="space-y-3.5">
+            <div class="p-4 text-center text-xs text-stone-400">Đang tải thực đơn từ Google Sheets...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CỬA SỔ KHUNG CHAT TRỰC TIẾP -->
+  <div id="chat-widget-box">
+    <div class="bg-amber-900 text-amber-50 px-4 py-3 flex items-center justify-between border-b border-amber-950">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center font-bold text-xs shadow">BM</div>
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider">Thực Dưỡng Ban Mai</h4>
+          <span class="text-[10px] text-emerald-300 flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-400 inline-block mr-1 animate-pulse"></span> Trực tuyến sẵn sàng</span>
+        </div>
+      </div>
+      <button onclick="toggleChatWidget()" class="text-amber-200 hover:text-white font-bold text-base px-2">✕</button>
+    </div>
+    
+    <div class="p-3 bg-amber-50/50 h-64 overflow-y-auto space-y-2.5 text-xs flex flex-col" id="chat-messages-container">
+      <div class="self-start bg-white p-3 rounded-2xl rounded-tl-none border border-amber-200 shadow-sm max-w-[85%] text-slate-700">
+        🌿 Chào anh/chị! BM luôn sẵn sàng lắng nghe và tư vấn thực đơn thanh đạm mỗi ngày. Anh/chị cần hỗ trợ gì cứ nhắn em nhé ạ!
+      </div>
+    </div>
+
+    <div class="p-3 bg-white border-t border-amber-100 flex items-center space-x-2">
+      <input type="text" id="chat-input-field" placeholder="Nhập tin nhắn gửi cho BM..." class="flex-1 text-xs bg-amber-50/60 border border-amber-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-amber-800 text-slate-800" onkeypress="handleChatKeyPress(event)">
+      <button onclick="sendChatMessage()" class="nature-button px-3.5 py-2.5 rounded-xl text-xs font-bold transition">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- THANH THANH TOÁN CỐ ĐỊNH Ở ĐÁY -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-3 px-4 z-20">
+    <div class="container-fluid-custom bottom-checkout-card p-3.5 flex items-center justify-between gap-3">
+      <div class="pl-1">
+        <div class="text-xs text-slate-500 font-medium">Đã chọn: <span id="selected-count" class="font-bold text-slate-800 text-sm">0</span> món</div>
+        <div class="text-xl sm:text-2xl font-black text-amber-900 tracking-tight leading-none mt-0.5" id="total-amount">0đ</div>
+      </div>
+
+      <div class="flex-1 max-w-[240px]">
+        <button id="pay-btn" disabled onclick="confirmAndSendOrder()" class="w-full nature-button font-extrabold py-3.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5 opacity-50 cursor-not-allowed text-xs sm:text-sm uppercase tracking-wider">
+          <i class="fa-solid fa-qrcode text-base text-amber-200"></i>
+          <span>Thanh Toán Ngay</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL NHẬP THÔNG TIN GIAO HÀNG & TỰ ĐỘNG ĐỊNH VỊ GPS -->
+  <div id="delivery-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="bg-white rounded-[32px] p-6 max-w-sm w-full shadow-2xl relative max-h-[90vh] overflow-y-auto border border-amber-100 text-left">
+      <button onclick="closeDeliveryModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg font-bold w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 transition">✕</button>
+      
+      <div class="text-center mb-4">
+        <div class="bg-amber-100 text-amber-900 text-xs font-bold py-1.5 px-3.5 rounded-full inline-block shadow-sm border border-amber-200 mb-1">
+          <i class="fa-solid fa-location-crosshairs mr-1 text-amber-700"></i> ĐỊNH VỊ & GIAO TẬN NƠI
+        </div>
+        <h3 class="text-base font-bold text-slate-800">Xác nhận thông tin & vị trí</h3>
+      </div>
+
+      <div class="space-y-3.5 mb-5">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Tên khách hàng / Số điện thoại:</label>
+          <input type="text" id="cust-info" placeholder="Ví dụ: Anh Tuấn - 0909xxxxxx" class="w-full text-xs font-medium text-slate-800 bg-amber-50/50 border border-amber-200 rounded-xl p-2.5 focus:outline-none focus:ring-1 focus:ring-amber-800">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Tên quán cà phê / Số bàn / Ghi chú:</label>
+          <textarea id="cust-address" rows="2" placeholder="Ví dụ: Ngồi bàn số 5 - Quán Cà Phê Góc Phố..." class="w-full text-xs font-medium text-slate-800 bg-amber-50/50 border border-amber-200 rounded-xl p-2.5 focus:outline-none focus:ring-1 focus:ring-amber-800"></textarea>
+        </div>
+
+        <!-- Trạng thái định vị GPS tự động -->
+        <div id="gps-status-box" class="bg-amber-50/90 p-3 rounded-xl border border-amber-200 text-xs text-amber-900 flex items-center justify-between">
+          <span id="gps-text"><i class="fa-solid fa-satellite-dish mr-1 text-amber-700"></i> Đang lấy tọa độ GPS vị trí của bạn...</span>
+          <button type="button" onclick="requestUserGPS()" class="bg-amber-800 text-white text-[10px] font-bold py-1 px-2.5 rounded-lg shadow-sm hover:bg-amber-950 transition">Lấy lại vị trí</button>
+        </div>
+        <input type="hidden" id="gps-lat" value="">
+        <input type="hidden" id="gps-lng" value="">
+        <input type="hidden" id="gps-maps-link" value="">
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Ước tính khoảng cách tới quán:</label>
+          <select id="modal-ship-select" class="w-full text-xs font-bold text-slate-800 bg-white border border-amber-300 rounded-xl p-2.5 focus:outline-none focus:ring-1 focus:ring-amber-800">
+            <option value="0">Dưới 3 km (Miễn phí ship)</option>
+            <option value="15000">Từ 3km - 5km (+15.000đ)</option>
+            <option value="25000">Từ 5km - 10km (+25.000đ)</option>
+            <option value="40000">Trên 10km (+40.000đ)</option>
+          </select>
+        </div>
+
+        <div class="text-[11px] text-amber-900/90 italic bg-amber-50/70 p-2.5 rounded-xl border border-amber-200/60 leading-relaxed">
+          🌿 Quán xin phép nhận đơn từ 2 phần trở lên (hoặc kèm sữa hạt) để hỗ trợ giao tận nơi nhanh chóng. Thương chúc anh/chị thưởng thức ngon miệng!
+        </div>
+      </div>
+
+      <button type="button" onclick="confirmAndSendOrderViaDeliveryModal()" class="w-full nature-button font-extrabold py-3.5 rounded-xl transition-all text-xs uppercase tracking-wider shadow-md">XÁC NHẬN ĐƠN & TẠO MÃ QR</button>
+    </div>
+  </div>
+
+  <!-- Modal Mã QR & Số thứ tự -->
+  <div id="qr-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="bg-white rounded-[32px] p-6 max-w-sm w-full text-center shadow-2xl relative max-h-[90vh] overflow-y-auto border border-amber-100">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg font-bold w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 transition">✕</button>
+      
+      <div class="bg-amber-100 text-amber-900 text-xs font-bold py-1.5 px-3.5 rounded-full inline-block mb-3 shadow-sm border border-amber-200">
+        <i class="fa-solid fa-check-circle mr-1 text-emerald-700"></i> ĐÃ GỬI ĐƠN VỀ QUÁN THÀNH CÔNG!
+      </div>
+
+      <h3 class="text-lg font-bold text-slate-800 mb-1">Mã QR Thanh Toán</h3>
+      <div class="text-xs font-bold text-amber-800 mb-1" id="modal-subtext">Tổng cộng: 0đ</div>
+      <p class="text-xs text-slate-500 italic mb-4 px-2">💡 Quét mã QR chuyển khoản (đã gồm tiền món và phí ship nếu có).</p>
+
+      <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 mb-4 flex justify-center shadow-inner">
+        <img id="vietqr-img" src="" alt="Mã VietQR" class="w-48 h-auto rounded-xl shadow-sm">
+      </div>
+
+      <div class="mb-5 bg-amber-50/70 rounded-2xl p-3.5 text-left border border-amber-200/80 space-y-2">
+        <div class="text-center bg-white py-2 px-3 rounded-xl border border-amber-200 shadow-sm">
+          <span class="text-[10px] text-slate-500 uppercase block font-bold tracking-wider">Mã đơn hàng</span>
+          <span id="modal-queue-number" class="text-xl font-black text-amber-900">#00</span>
+        </div>
+        <div class="text-xs text-slate-700 flex justify-between items-center px-1">
+          <span class="font-semibold">Tiền món ăn:</span>
+          <span id="modal-food-amount" class="font-bold text-slate-800">0đ</span>
+        </div>
+        <div class="text-xs text-slate-700 flex justify-between items-center px-1">
+          <span class="font-semibold">Phí vận chuyển:</span>
+          <span id="modal-ship-amount" class="font-bold text-amber-800">0đ</span>
+        </div>
+        <div class="text-xs text-slate-700 flex justify-between items-center pt-1.5 border-t border-amber-200/60 px-1">
+          <span class="font-bold text-amber-900">Tổng thanh toán:</span>
+          <span id="modal-counter-amount" class="font-extrabold text-amber-900 text-sm">0đ</span>
+        </div>
+        <div class="text-[11px] text-slate-600 pt-1.5 border-t border-amber-200/60 px-1" id="modal-cust-container" style="display:none;">
+          <span class="font-semibold block mb-0.5">Khách hàng & Vị trí:</span>
+          <div id="modal-cust-detail" class="italic text-slate-700 font-medium">Chưa có thông tin</div>
+        </div>
+        <div class="text-[11px] text-slate-600 pt-1.5 border-t border-amber-200/60 px-1">
+          <span class="font-semibold block mb-0.5">Chi tiết đơn:</span>
+          <div id="modal-items-detail" class="italic text-slate-500">Chưa có món nào</div>
+        </div>
+      </div>
+
+      <button onclick="closeModal()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3.5 rounded-xl transition-all text-xs uppercase tracking-wider shadow-md">ĐÓNG & HOÀN TẤT</button>
+    </div>
+  </div>
+
+  <!-- MODAL PHÓNG TO ẢNH MÓN ĂN -->
+  <div id="zoomModal" class="image-zoom-modal" onclick="closeZoomModal()">
+    <img id="zoomedImg" src="" alt="Ảnh phóng to">
+  </div>
+
+  <script>
+    // PHÁT ÂM THANH "TON" TRONG TRẺO KHI MỞ TRANG
+    function playWelcomeTone() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // Nốt C5 trong trẻo
+        osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.3); // Ngân cao lên
+        
+        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+        
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.8);
+      } catch (e) {
+        console.log("Audio autoplay restricted:", e);
+      }
+    }
+
+    window.allMenuItems = [];
+    window.itemQtys = {};
+    let calculatedTotalAmount = 0;
+    let foodOnlyAmount = 0;
+    let currentShippingFee = 0;
+    let isSubmitting = false;
+
+    const GOOGLE_SHEET_TSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT8FL1I6X3D4DnDj9GGaa_uSh16ndMuwRf_9CifRjhpSw22KmoD8D7GrOyQkU7k4uE4pJyTYo1AQXpX/pub?output=tsv";
+
+    function toggleChatWidget() {
+      const chatBox = document.getElementById('chat-widget-box');
+      if (chatBox.style.display === 'flex') {
+        chatBox.style.display = 'none';
+      } else {
+        chatBox.style.display = 'flex';
+        document.getElementById('chat-input-field').focus();
+      }
+    }
+
+    function handleChatKeyPress(e) {
+      if (e.key === 'Enter') {
+        sendChatMessage();
+      }
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chat-input-field');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const container = document.getElementById('chat-messages-container');
+      
+      container.innerHTML += `
+        <div class="self-end bg-amber-900 text-amber-50 p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[85%]">
+          ${text}
+        </div>
+      `;
+      input.value = '';
+      container.scrollTop = container.scrollHeight;
+
+      setTimeout(() => {
+        container.innerHTML += `
+          <div class="self-start bg-white p-3 rounded-2xl rounded-tl-none border border-amber-200 shadow-sm max-w-[85%] text-slate-700">
+            🌿 BM đã nhận được tin nhắn và sẽ phản hồi anh/chị ngay ạ!
+          </div>
+        `;
+        container.scrollTop = container.scrollHeight;
+      }, 800);
+    }
+
+    function createItemCard(item) {
+      const qty = window.itemQtys[item.id] || 0;
+      return `
+        <div class="item-card p-4 shadow-sm flex items-center justify-between" id="card-${item.id}" onclick="handleCardClick(event, '${item.img}')">
+          <div class="flex items-center space-x-3.5 flex-1 pr-2 min-w-0">
+            <img src="${item.img}" alt="${item.name}" class="w-16 h-16 rounded-2xl object-cover shrink-0 bg-amber-50 shadow-sm border border-slate-100" loading="eager" fetchpriority="high" onerror="this.outerHTML='<div class=\'w-16 h-16 rounded-2xl bg-amber-50 border border-slate-100 flex items-center justify-center text-2xl shrink-0 shadow-sm\'>🍵</div>'">
+            <div class="min-w-0 flex-1">
+              <div class="font-bold text-slate-800 text-base leading-snug truncate">${item.name}</div>
+              <div class="text-amber-700 text-xs font-medium mt-0.5 truncate">${item.desc}</div>
+              <div class="text-amber-900 font-extrabold text-sm mt-1">${item.price.toLocaleString('vi-VN')}đ <span class="text-xs text-slate-400 font-normal">/ ${item.unit}</span></div>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3 shrink-0">
+            <div id="qty-box-${item.id}" class="${qty > 0 ? 'flex' : 'hidden'} items-center space-x-1 bg-slate-100 p-1 rounded-xl">
+              <button type="button" onclick="changeQty(event, '${item.id}', -1)" class="w-8 h-8 rounded-lg bg-white text-slate-700 font-bold shadow-sm flex items-center justify-center active:scale-95 transition">-</button>
+              <span id="qty-val-${item.id}" class="w-6 text-center font-bold text-sm">${qty > 0 ? qty : 1}</span>
+              <button type="button" onclick="changeQty(event, '${item.id}', 1)" class="w-8 h-8 rounded-lg bg-white text-amber-900 font-bold shadow-sm flex items-center justify-center active:scale-95 transition">+</button>
+            </div>
+            <input type="checkbox" ${qty > 0 ? 'checked' : ''} id="chk-${item.id}" class="w-6 h-6 accent-amber-800 rounded-lg cursor-pointer" onclick="event.stopPropagation()" onchange="toggleItem('${item.id}')">
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadMenuFromGoogleSheets() {
+      playWelcomeTone(); // Kích hoạt âm thanh "ton" khi mở web
+      const startTime = Date.now();
+      try {
+        const response = await fetch(GOOGLE_SHEET_TSV_URL);
+        const text = await response.text();
+        
+        const lines = text.split('\n');
+        window.allMenuItems = [];
+        let breakfastHTML = "";
+        let milkHTML = "";
+
+        for (let i = 1; i < lines.length; i++) {
+          let line = lines[i].trim();
+          if (!line) continue;
+          
+          let cols = line.split('\t').map(col => col.trim().replace(/^"|"$/g, ''));
+
+          if (cols.length >= 6) {
+            const id = cols[0] || i;
+            const category = (cols[1] || '').toLowerCase();
+            const name = cols[2] || '';
+            const price = parseInt(cols[3].replace(/\D/g, '')) || 0;
+            const unit = cols[4] || 'phần';
+            const desc = cols[5] || '';
+            const img = cols[6] || 'images/logo.png';
+
+            if (!name) continue;
+
+            const item = { id, category, name, price, unit, desc, img };
+            window.allMenuItems.push(item);
+
+            if (img && img !== 'images/logo.png') {
+              const preloadImg = new Image();
+              preloadImg.src = img;
+            }
+
+            if (category.includes('milk') || category.includes('sữa') || category.includes('hạt')) {
+              milkHTML += createItemCard(item);
+            } else {
+              breakfastHTML += createItemCard(item);
+            }
+          }
+        }
+
+        document.getElementById('food-container').innerHTML = breakfastHTML || '<div class="p-4 text-center text-xs text-stone-400">Chưa có món ăn sáng nào</div>';
+        document.getElementById('milk-container').innerHTML = milkHTML || '<div class="p-4 text-center text-xs text-stone-400">Chưa có món sữa hạt nào</div>';
+        updateSummary();
+
+        // Đảm bảo màn hình chào hiển thị chính xác đủ 3 giây
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, 3000 - elapsedTime);
+
+        setTimeout(() => {
+          const splash = document.getElementById('splash-screen');
+          if (splash) {
+            splash.classList.add('fade-out');
+            setTimeout(() => splash.remove(), 800);
+          }
+        }, remainingTime);
+
+      } catch (error) {
+        console.error("Lỗi tải menu:", error);
+        document.getElementById('food-container').innerHTML = '<div class="p-4 text-center text-xs text-red-500">Không thể tải dữ liệu từ Google Sheets.</div>';
+        document.getElementById('milk-container').innerHTML = '<div class="p-4 text-center text-xs text-red-500">Không thể tải dữ liệu từ Google Sheets.</div>';
+        
+        const splash = document.getElementById('splash-screen');
+        if (splash) splash.remove();
+      }
+    }
+
+    window.toggleItem = function(id) {
+      const chk = document.getElementById(`chk-${id}`);
+      const qtyBox = document.getElementById(`qty-box-${id}`);
+      const card = document.getElementById(`card-${id}`);
+      const qtyValSpan = document.getElementById(`qty-val-${id}`);
+
+      if (chk.checked) {
+        card.classList.add('selected');
+        qtyBox.classList.remove('hidden');
+        qtyBox.classList.add('flex');
+        window.itemQtys[id] = 1; 
+        if (qtyValSpan) qtyValSpan.innerText = "1";
+      } else {
+        card.classList.remove('selected');
+        qtyBox.classList.add('hidden');
+        qtyBox.classList.remove('flex');
+        delete window.itemQtys[id];
+      }
+      updateSummary();
+    };
+
+    window.changeQty = function(event, id, delta) {
+      event.stopPropagation();
+      if (!window.itemQtys[id]) window.itemQtys[id] = 1;
+      window.itemQtys[id] += delta;
+      if (window.itemQtys[id] < 1) {
+        window.itemQtys[id] = 1;
+      }
+      const qtyValSpan = document.getElementById(`qty-val-${id}`);
+      if (qtyValSpan) qtyValSpan.innerText = window.itemQtys[id];
+      updateSummary();
+    };
+
+    window.updateSummary = function() {
+      let totalCount = 0;
+      foodOnlyAmount = 0;
+
+      for (const id in window.itemQtys) {
+        const qty = window.itemQtys[id];
+        if (qty > 0) {
+          const item = window.allMenuItems.find(i => String(i.id) === String(id));
+          if (item) {
+            totalCount += qty;
+            foodOnlyAmount += qty * item.price;
+          }
+        }
+      }
+
+      calculatedTotalAmount = foodOnlyAmount;
+
+      document.getElementById('selected-count').innerText = totalCount;
+      document.getElementById('total-amount').innerText = calculatedTotalAmount.toLocaleString('vi-VN') + 'đ';
+
+      const payBtn = document.getElementById('pay-btn');
+      if (totalCount > 0) {
+        payBtn.removeAttribute('disabled');
+        payBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      } else {
+        payBtn.setAttribute('disabled', 'true');
+        payBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    };
+
+    window.clearAllSelectedItems = function() {
+      window.itemQtys = {};
+      window.allMenuItems.forEach(item => {
+        const card = document.getElementById(`card-${item.id}`);
+        const chk = document.getElementById(`chk-${item.id}`);
+        const qtyBox = document.getElementById(`qty-box-${item.id}`);
+        
+        if (card) card.classList.remove('selected');
+        if (chk) chk.checked = false;
+        if (qtyBox) {
+          qtyBox.classList.add('hidden');
+          qtyBox.classList.remove('flex');
+        }
+      });
+      updateSummary();
+    };
+
+    function handleCardClick(event, imgSrc) {
+      if (event.target.tagName === 'BUTTON' || event.target.tagName === 'INPUT' || event.target.closest('div[id^="qty-box-"]')) {
+        return;
+      }
+      const modal = document.getElementById('zoomModal');
+      const zoomedImg = document.getElementById('zoomedImg');
+      zoomedImg.src = imgSrc;
+      modal.style.display = 'flex';
+    }
+
+    window.closeZoomModal = function() {
+      document.getElementById('zoomModal').style.display = 'none';
+    }
+
+    function requestUserGPS() {
+      const gpsText = document.getElementById('gps-text');
+      if (!navigator.geolocation) {
+        gpsText.innerHTML = '<span class="text-red-600">⚠️ Trình duyệt không hỗ trợ định vị GPS.</span>';
+        return;
+      }
+
+      gpsText.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang kết nối vệ tinh tìm vị trí của bạn...';
+      
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const mapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
+          
+          document.getElementById('gps-lat').value = lat;
+          document.getElementById('gps-lng').value = lng;
+          document.getElementById('gps-maps-link').value = mapsLink;
+          
+          gpsText.innerHTML = '<span class="text-emerald-700 font-bold"><i class="fa-solid fa-circle-check mr-1"></i> Đã định vị vị trí thành công!</span>';
+        },
+        (error) => {
+          console.warn("Lỗi định vị GPS:", error);
+          gpsText.innerHTML = '<span class="text-amber-700">⚠️ Không lấy được GPS tự động (Vui lòng ghi rõ tên quán & số bàn bên dưới).</span>';
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+
+    window.onload = function() {
+      loadMenuFromGoogleSheets();
+    };
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDSZu1wfzRVRccWoqueIi0liObN_Fqhi9c",
+      authDomain: "bbbanmai.firebaseapp.com",
+      projectId: "bbbanmai",
+      storageBucket: "bbbanmai.firebasestorage.app",
+      messagingSenderId: "924473815321",
+      appId: "1:924473815321:web:9a47e002f4485a979a1588",
+      measurementId: "G-C364RE402E"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyIOgKxka51JPmSLXtvsnmXfaoGSTpitThRxmxi1S3oOEDtTPqRFJMQoB-z34c6Nvwsfg/exec";
+
+    window.confirmAndSendOrder = async function() {
+      processOrderCheckout(0, "", "", "");
+    };
+
+    window.openDeliveryModal = function() {
+      let totalCount = 0;
+      window.allMenuItems.forEach(item => {
+        if (window.itemQtys[item.id] > 0) totalCount++;
+      });
+      if (totalCount === 0) {
+        alert("Vui lòng chọn ít nhất một món ăn trước khi đặt món nhé ạ!");
+        return;
+      }
+      const modal = document.getElementById('delivery-modal');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      
+      requestUserGPS();
+    };
+
+    window.closeDeliveryModal = function() {
+      const modal = document.getElementById('delivery-modal');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      window.clearAllSelectedItems();
+    };
+
+    window.confirmAndSendOrderViaDeliveryModal = async function() {
+      const custInfo = document.getElementById('cust-info').value.trim();
+      const custAddress = document.getElementById('cust-address').value.trim();
+
+      if (!custInfo || !custAddress) {
+        alert("Vui lòng nhập tên/số điện thoại và tên quán cà phê/số bàn để quán tiện giao nhé ạ!");
+        return;
+      }
+
+      const shipSelect = document.getElementById('modal-ship-select');
+      const shipFee = shipSelect ? parseInt(shipSelect.value) || 0 : 0;
+      const shipText = shipSelect.selectedOptions[0].text;
+      
+      const mapsLink = document.getElementById('gps-maps-link').value.trim();
+
+      const modal = document.getElementById('delivery-modal');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+
+      processOrderCheckout(shipFee, custInfo, custAddress, shipText, mapsLink);
+    };
+
+    async function processOrderCheckout(shipFee, custInfo, custAddress, shipText, mapsLink) {
+      if (isSubmitting) return;
+      isSubmitting = true;
+
+      currentShippingFee = shipFee;
+      calculatedTotalAmount = foodOnlyAmount + currentShippingFee;
+
+      let orderItems = [];
+      let itemsDetailText = "";
+
+      window.allMenuItems.forEach(item => {
+        const qty = window.itemQtys[item.id] || 0;
+        if (qty > 0) {
+          orderItems.push({ name: item.name, qty: qty, price: item.price });
+          itemsDetailText += `- ${item.name} (SL: ${qty})\n`;
+        }
+      });
+
+      if (shipFee > 0 && shipText) {
+        itemsDetailText += `[Vận chuyển: ${shipText}]`;
+      }
+      if (mapsLink) {
+        itemsDetailText += `\n📍 Link Bản Đồ GPS: ${mapsLink}`;
+      }
+
+      const queueNumber = "HD" + Math.floor(1000 + Math.random() * 9000);
+      const timestamp = new Date().toLocaleString('vi-VN');
+
+      let itemsString = orderItems.map(item => `${item.name} (x${item.qty})`).join(", ");
+      if (shipFee > 0 && shipText) {
+        itemsString += ` | Ship: ${shipText}`;
+      }
+      if (custInfo && custAddress) {
+        itemsString += ` | Khách: ${custInfo} - ${custAddress}`;
+      }
+      if (mapsLink) {
+        itemsString += ` | GPS: ${mapsLink}`;
+      }
+
+      const orderData = {
+        orderId: queueNumber,
+        queueNumber: queueNumber,
+        customer: custInfo || "Khách tại quán",
+        address: custAddress || "Tại chỗ",
+        gpsLink: mapsLink || "",
+        items: orderItems,
+        itemsString: itemsString,
+        text: itemsString,
+        foodAmount: foodOnlyAmount,
+        shippingFee: currentShippingFee,
+        totalAmount: calculatedTotalAmount,
+        total: calculatedTotalAmount.toLocaleString('vi-VN') + 'đ',
+        tongTien: calculatedTotalAmount.toLocaleString('vi-VN') + 'đ',
+        time: timestamp,
+        timestamp: timestamp,
+        status: "Mới"
+      };
+
+      try {
+        const ordersRef = ref(db, 'orders');
+        await push(ordersRef, orderData);
+
+        if (GOOGLE_SHEET_WEB_APP_URL) {
+          fetch(GOOGLE_SHEET_WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId: queueNumber,
+              itemsString: itemsString,
+              total: calculatedTotalAmount.toLocaleString('vi-VN') + 'đ'
+            })
+          }).catch(err => console.log('Apps Script sync note:', err));
+        }
+
+        document.getElementById('modal-subtext').innerText = `Tổng cộng: ${calculatedTotalAmount.toLocaleString('vi-VN')}đ`;
+        document.getElementById('modal-food-amount').innerText = foodOnlyAmount.toLocaleString('vi-VN') + 'đ';
+        document.getElementById('modal-ship-amount').innerText = currentShippingFee.toLocaleString('vi-VN') + 'đ';
+        document.getElementById('modal-counter-amount').innerText = calculatedTotalAmount.toLocaleString('vi-VN') + 'đ';
+        document.getElementById('modal-queue-number').innerText = queueNumber;
+        document.getElementById('modal-items-detail').innerText = itemsDetailText.trim();
+
+        if (custInfo && custAddress) {
+          let detailHtml = `${custInfo} (${custAddress})`;
+          if (mapsLink) {
+            detailHtml += `<br><a href="${mapsLink}" target="_blank" class="text-amber-800 font-bold underline mt-1 inline-block"><i class="fa-solid fa-map-location-dot mr-1"></i> Bấm mở bản đồ Google Maps đến vị trí khách</a>`;
+          }
+          document.getElementById('modal-cust-detail').innerHTML = detailHtml;
+          document.getElementById('modal-cust-container').style.display = 'block';
+        } else {
+          document.getElementById('modal-cust-container').style.display = 'none';
+        }
+        
+        const vietQRUrl = `https://img.vietqr.io/image/970436-0281000834040-compact2.jpg?amount=${calculatedTotalAmount}&addInfo=BB%20Ban%20Mai%20${queueNumber}&accountName=LE%20VAN%20DUY`;
+        document.getElementById('vietqr-img').src = vietQRUrl;
+
+        const modal = document.getElementById('qr-modal');
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+
+      } catch (error) {
+        console.error("Lỗi khi gửi đơn:", error);
+        alert("Có lỗi xảy ra khi gửi đơn hàng. Vui lòng thử lại!");
+      } finally {
+        isSubmitting = false;
+      }
+    };
+
+    window.closeModal = function() {
+      const modal = document.getElementById('qr-modal');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      location.reload(); 
+    };
+  </script>
+</body>
+</html>
